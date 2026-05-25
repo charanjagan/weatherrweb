@@ -20,7 +20,7 @@
 <div align="center">
 
 ```
-╭─ charan@ceg:~/WeatherrWeb  ──────────────────────────────╮
+╭─ charan@mr.zeus:~/WeatherrWeb  ───────────────────────────╮
 │                                                           │
 │  $ ./weatherrweb --info                                   │
 │                                                           │
