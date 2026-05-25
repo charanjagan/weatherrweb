@@ -1,4 +1,5 @@
 <div align="center">
+'''
 ██╗    ██╗███████╗ █████╗ ████████╗██╗  ██╗███████╗██████╗ ██████╗ 
 ██║    ██║██╔════╝██╔══██╗╚══██╔══╝██║  ██║██╔════╝██╔══██╗██╔══██╗
 ██║ █╗ ██║█████╗  ███████║   ██║   ███████║█████╗  ██████╔╝██████╔╝
@@ -11,10 +12,12 @@
 ██║███╗██║██╔══╝  ██╔══██╗
 ╚███╔███╔╝███████╗██████╔╝
  ╚══╝╚══╝ ╚══════╝╚═════╝
-
- </div>
+'''
 </div>
-╭─ charan:~/WeatherrWeb  ───────────────────────────────────╮
+<div align="center">
+
+```
+╭─ charan@ceg:~/WeatherrWeb  ──────────────────────────────╮
 │                                                           │
 │  $ ./weatherrweb --info                                   │
 │                                                           │
@@ -32,33 +35,46 @@
 │  "It's not a bug, it's a weather anomaly." — me, always   │
 │                                                           │
 ╰───────────────────────────────────────────────────────────╯
+```
 
-<div align="center">
+</div>
 
-🚧 Project Status: Active
+---
 
-Core app is done and live. But I'm not finished yet.
-Updates are in the pipeline. Stay tuned.
+## 🚧 Project Status: Active
 
-<div align="center">
+> Core app is **done and live**. But I'm not finished yet.
+> Updates are in the pipeline. Stay tuned.
 
-🔧 What It Does
+---
+
+## 🔧 What It Does
+
+```
 ✅ Search weather by city
 ✅ Current conditions (temp, humidity, wind, feels like)
 ✅ 5-day forecast
 ✅ Dark mode
 ✅ Responsive design (mobile + desktop)
 ✅ Overdue... wait, wrong project. This one just has vibes.
+```
 
-<div align="center">
+---
 
-🛠️ Built With
+## 🛠️ Built With
+
+```
 Next.js · TypeScript · Tailwind CSS · OpenWeatherMap API
 Vercel · GitHub · Claude Code · sleep deprivation
+```
+
+---
 
 <div align="center">
 
+```
 repo status: shipped. more on the way.
 last updated: May 2026
+```
 
 </div>
