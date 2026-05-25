@@ -13,7 +13,7 @@
  ╚══╝╚══╝ ╚══════╝╚═════╝
 
  </div>
-<div align="center">
+</div>
 ╭─ charan:~/WeatherrWeb  ───────────────────────────────────╮
 │                                                           │
 │  $ ./weatherrweb --info                                   │
