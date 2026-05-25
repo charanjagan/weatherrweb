@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+██╗    ██╗███████╗ █████╗ ████████╗██╗  ██╗███████╗██████╗ ██████╗ 
+██║    ██║██╔════╝██╔══██╗╚══██╔══╝██║  ██║██╔════╝██╔══██╗██╔══██╗
+██║ █╗ ██║█████╗  ███████║   ██║   ███████║█████╗  ██████╔╝██████╔╝
+██║███╗██║██╔══╝  ██╔══██║   ██║   ██╔══██║██╔══╝  ██╔══██╗██╔══██╗
+╚███╔███╔╝███████╗██║  ██║   ██║   ██║  ██║███████╗██║  ██║██║  ██║
+ ╚══╝╚══╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝
 
-## Getting Started
+ </div>
+<div align="center">
+╭─ charan:~/WeatherrWeb  ───────────────────────────────────╮
+│                                                           │
+│  $ ./weatherrweb --info                                   │
+│                                                           │
+│  ► A weather web app. No nonsense, just forecasts.        │
+│  ► Built with Claude Code at an unreasonable hour.        │
+│  ► Shipped to Vercel. More updates incoming.              │
+│                                                           │
+│  $ cat status.txt                                         │
+│                                                           │
+│  ► Core functionality: done, but will do more             │
+│  ► UI polish: [ ██████████ ] shipped                      │
+│  ► Features: everything planned, delivered                │
+│  ► Weather accuracy: ask the clouds                       │
+│                                                           │
+│  "It's not a bug, it's a weather anomaly." — me, always   │
+│                                                           │
+╰───────────────────────────────────────────────────────────╯
 
-First, run the development server:
+<div align="center">
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+🚧 Project Status: Active
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Core app is done and live. But I'm not finished yet.
+Updates are in the pipeline. Stay tuned.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+<div align="center">
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+🔧 What It Does
+✅ Search weather by city
+✅ Current conditions (temp, humidity, wind, feels like)
+✅ 5-day forecast
+✅ Dark mode
+✅ Responsive design (mobile + desktop)
+✅ Overdue... wait, wrong project. This one just has vibes.
 
-## Learn More
+<div align="center">
 
-To learn more about Next.js, take a look at the following resources:
+🛠️ Built With
+Next.js · TypeScript · Tailwind CSS · OpenWeatherMap API
+Vercel · GitHub · Claude Code · sleep deprivation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+<div align="center">
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+repo status: shipped. more on the way.
+last updated: May 2026
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+</div>
