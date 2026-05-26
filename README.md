@@ -54,7 +54,8 @@
 ## 🔧 What It Does
 
 ```
-✅ Search weather by city
+✅ Search weather by country,city
+✅ Added chosing temperature based on map clicks
 ✅ Current conditions (temp, humidity, wind, feels like)
 ✅ 5-day forecast
 ✅ Dark mode
