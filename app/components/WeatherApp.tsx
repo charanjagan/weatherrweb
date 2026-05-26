@@ -1,16 +1,25 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useApp } from "@/app/components/store";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useApp, type SavedLocation } from "@/app/components/store";
 import Header from "@/app/components/Header";
 import WeatherView from "@/app/components/WeatherView";
 import WarningsBanner from "@/app/components/WarningsBanner";
 import SettingsModal from "@/app/components/SettingsModal";
 import LocationModal from "@/app/components/LocationModal";
+import MapWrapper from "@/app/components/MapWrapper";
+import type { MapFocus, MapSelection } from "@/app/components/WeatherMap";
 import { computeModel } from "@/lib/process-weather";
 import { deriveWarnings } from "@/lib/warnings";
 import { wmoToGradient, chrome } from "@/lib/weather-utils";
 import type { RawWeather } from "@/lib/weather";
+
+type Target = {
+  name: string;
+  sublabel: string;
+  latitude: number;
+  longitude: number;
+};
 
 export default function WeatherApp() {
   const {
@@ -18,10 +27,11 @@ export default function WeatherApp() {
     resolvedTheme,
     settings,
     activeLocation,
-    activeId,
     setActive,
-    savedLocations,
+    addLocation,
+    isSaved,
     currentGeo,
+    geoStatus,
     requestCurrentLocation,
   } = useApp();
 
@@ -33,8 +43,30 @@ export default function WeatherApp() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [locationsOpen, setLocationsOpen] = useState(false);
 
-  const lat = activeLocation?.latitude;
-  const lon = activeLocation?.longitude;
+  const [mapSelection, setMapSelection] = useState<Target | null>(null);
+  const [mapFocus, setMapFocus] = useState<MapFocus>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const c = chrome(resolvedTheme);
+
+  // A location chosen from the store (search / saved / current) drives the map
+  // and opens the drawer. A point picked directly on the map takes priority and
+  // is held separately so it doesn't mutate the user's saved selection.
+  const activeId = activeLocation?.id;
+  const activeLat = activeLocation?.latitude;
+  const activeLon = activeLocation?.longitude;
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    if (activeLat === undefined || activeLon === undefined) return;
+    setMapSelection(null);
+    setMapFocus({ lat: activeLat, lon: activeLon, zoom: 9 });
+    setDrawerOpen(true);
+  }, [activeId, activeLat, activeLon]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  const target: Target | null = mapSelection ?? activeLocation ?? null;
+  const lat = target?.latitude;
+  const lon = target?.longitude;
   const key = lat !== undefined && lon !== undefined ? `${lat},${lon}` : null;
 
   useEffect(() => {
@@ -66,121 +98,193 @@ export default function WeatherApp() {
     ? wmoToGradient(model.current.code, model.isDay, resolvedTheme)
     : wmoToGradient(0, true, resolvedTheme);
 
-  const c = chrome(resolvedTheme);
-
   useEffect(() => {
-    document.body.style.background = grad.bottom;
-  }, [grad.bottom]);
+    document.body.style.background =
+      resolvedTheme === "dark" ? "#0a0a0a" : "#eef2f6";
+  }, [resolvedTheme]);
+
+  const handleMapSelect = useCallback((sel: MapSelection) => {
+    setMapSelection({
+      name: sel.name,
+      sublabel: `${sel.lat.toFixed(2)}°, ${sel.lon.toFixed(2)}°`,
+      latitude: sel.lat,
+      longitude: sel.lon,
+    });
+    setDrawerOpen(true);
+  }, []);
+
+  const handleLocate = useCallback(() => {
+    if (currentGeo) {
+      setActive("current");
+      setMapSelection(null);
+      setMapFocus({ lat: currentGeo.latitude, lon: currentGeo.longitude, zoom: 10 });
+      setDrawerOpen(true);
+    } else {
+      requestCurrentLocation();
+    }
+  }, [currentGeo, setActive, requestCurrentLocation]);
+
+  const pointId = mapSelection
+    ? `pt-${mapSelection.latitude.toFixed(3)}_${mapSelection.longitude.toFixed(3)}`
+    : null;
+
+  const saveCurrentPoint = useCallback(() => {
+    if (!mapSelection || !pointId) return;
+    const loc: SavedLocation = {
+      id: pointId,
+      name: mapSelection.name,
+      latitude: mapSelection.latitude,
+      longitude: mapSelection.longitude,
+      country: "",
+      admin1: "",
+    };
+    addLocation(loc);
+    setMapSelection(null);
+    setActive(loc.id);
+  }, [mapSelection, pointId, addLocation, setActive]);
+
+  const showGeoLoading =
+    ready && geoStatus === "loading" && !mapSelection && !activeLocation;
 
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background: `linear-gradient(to bottom, ${grad.top} 0%, ${grad.bottom} 100%)`,
-        fontFamily: "-apple-system, 'Helvetica Neue', Arial, sans-serif",
-        color: c.text,
-      }}
-    >
+    <div className="fixed inset-0 overflow-hidden" style={{ color: c.text }}>
       <Header
         theme={resolvedTheme}
         onOpenLocations={() => setLocationsOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
+        onLocate={handleLocate}
       />
 
-      {/* Location tabs */}
-      <div className="mx-auto max-w-[420px] lg:max-w-[1400px] xl:max-w-[1600px] px-3 lg:px-6 pt-3">
-        <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
-          <Pill
-            theme={resolvedTheme}
-            active={activeId === "current"}
-            onClick={() => {
-              if (currentGeo) setActive("current");
-              else requestCurrentLocation();
-            }}
-          >
-            📍 {currentGeo ? "My Location" : "Current"}
-          </Pill>
-          {savedLocations.map((loc) => (
-            <Pill
-              key={loc.id}
-              theme={resolvedTheme}
-              active={activeId === loc.id}
-              onClick={() => setActive(loc.id)}
-            >
-              {loc.name}
-            </Pill>
-          ))}
-          <Pill theme={resolvedTheme} active={false} onClick={() => setLocationsOpen(true)}>
-            +
-          </Pill>
-        </div>
+      {/* Map fills the screen */}
+      <div className="absolute inset-0 pt-14">
+        <MapWrapper
+          theme={resolvedTheme}
+          onSelectLocation={handleMapSelect}
+          focus={mapFocus}
+        />
       </div>
 
-      {warnings.length > 0 && (
-        <WarningsBanner warnings={warnings} theme={resolvedTheme} />
+      {/* Geolocation loading chip */}
+      {showGeoLoading && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1100] flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/90 dark:bg-neutral-900/90 backdrop-blur shadow-lg border border-black/5 dark:border-white/10">
+          <Spinner color={resolvedTheme === "dark" ? "#fff" : "#0f2740"} />
+          <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
+            Finding your location…
+          </span>
+        </div>
       )}
 
-      {/* Body */}
-      <div className="px-3 lg:px-6 pb-10 pt-3">
-        {!ready ? (
-          <Centered>
-            <Spinner color={c.text} />
-            <p className="mt-3 text-[15px]" style={{ color: c.sub }}>
-              Loading weather…
-            </p>
-          </Centered>
-        ) : !activeLocation ? (
-          <Centered>
-            <p className="text-[15px]" style={{ color: c.sub }}>
-              No location selected.
-            </p>
-            <button
-              onClick={() => setLocationsOpen(true)}
-              className="mt-3 px-4 py-2 rounded-full text-[15px] font-medium"
-              style={{ background: c.cardStrong, color: c.text }}
-            >
-              Add a location
-            </button>
-          </Centered>
-        ) : isError ? (
-          <Centered>
-            <p className="text-[15px]" style={{ color: c.sub }}>
-              Couldn&apos;t load weather for this location.
-            </p>
-            <button
-              onClick={() => {
-                setErrorKey(null);
-                setReloadTick((t) => t + 1);
-              }}
-              className="mt-3 px-4 py-2 rounded-full text-[15px] font-medium"
-              style={{ background: c.cardStrong, color: c.text }}
-            >
-              Retry
-            </button>
-          </Centered>
-        ) : model ? (
+      {/* Reopen tab when a target exists but drawer is closed */}
+      {target && !drawerOpen && (
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 lg:left-auto lg:right-4 lg:translate-x-0 z-[1100] px-4 py-2.5 rounded-full text-sm font-medium shadow-lg backdrop-blur border"
+          style={{
+            background: c.cardStrong,
+            color: c.text,
+            borderColor: c.border,
+          }}
+        >
+          Show weather · {target.name}
+        </button>
+      )}
+
+      {/* Weather drawer */}
+      <div
+        className={`fixed z-[1200] transition-transform duration-300 ease-out
+          inset-x-0 bottom-0 max-h-[88vh] rounded-t-3xl
+          lg:inset-y-0 lg:right-0 lg:left-auto lg:w-[440px] lg:max-h-none lg:rounded-none lg:rounded-l-3xl
+          ${
+            drawerOpen && target
+              ? "translate-y-0 lg:translate-x-0"
+              : "translate-y-full lg:translate-y-0 lg:translate-x-full"
+          }`}
+        style={{
+          background: `linear-gradient(to bottom, ${grad.top} 0%, ${grad.bottom} 100%)`,
+          boxShadow:
+            resolvedTheme === "dark"
+              ? "0 -8px 40px rgba(0,0,0,0.5)"
+              : "0 -8px 40px rgba(0,0,0,0.25)",
+        }}
+      >
+        <div className="flex flex-col h-full max-h-[88vh] lg:max-h-screen overflow-y-auto scrollbar-none">
+          {/* Drawer header */}
           <div
+            className="sticky top-0 z-10 flex items-center justify-between px-5 py-3 backdrop-blur-md"
             style={{
-              opacity: loading ? 0.5 : 1,
-              transition: "opacity 0.2s",
+              background:
+                resolvedTheme === "dark"
+                  ? "rgba(0,0,0,0.15)"
+                  : "rgba(255,255,255,0.18)",
+              borderBottom: `1px solid ${c.border}`,
             }}
           >
-            <WeatherView
-              model={model}
-              units={settings.units}
-              theme={resolvedTheme}
-              locationName={activeLocation.name}
-              sublabel={activeLocation.sublabel}
-            />
+            <span className="text-[15px] font-semibold truncate">
+              {target?.name ?? "Weather"}
+            </span>
+            <div className="flex items-center gap-2 shrink-0">
+              {mapSelection && pointId && !isSaved(pointId) && (
+                <button
+                  onClick={saveCurrentPoint}
+                  className="px-3 py-1.5 rounded-full text-[13px] font-medium"
+                  style={{ background: c.cardStrong, color: c.text }}
+                >
+                  + Save
+                </button>
+              )}
+              <button
+                onClick={() => setDrawerOpen(false)}
+                aria-label="Close"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-xl leading-none"
+                style={{ background: c.card, color: c.text }}
+              >
+                ×
+              </button>
+            </div>
           </div>
-        ) : (
-          <Centered>
-            <Spinner color={c.text} />
-            <p className="mt-3 text-[15px]" style={{ color: c.sub }}>
-              Loading weather…
-            </p>
-          </Centered>
-        )}
+
+          <div className="px-3 pb-8">
+            {warnings.length > 0 && (
+              <WarningsBanner warnings={warnings} theme={resolvedTheme} compact />
+            )}
+
+            {isError ? (
+              <Centered>
+                <p className="text-[15px]" style={{ color: c.sub }}>
+                  Couldn&apos;t load weather for this location.
+                </p>
+                <button
+                  onClick={() => {
+                    setErrorKey(null);
+                    setReloadTick((t) => t + 1);
+                  }}
+                  className="mt-3 px-4 py-2 rounded-full text-[15px] font-medium"
+                  style={{ background: c.cardStrong, color: c.text }}
+                >
+                  Retry
+                </button>
+              </Centered>
+            ) : model && isFresh ? (
+              <div style={{ opacity: loading ? 0.5 : 1, transition: "opacity 0.2s" }}>
+                <WeatherView
+                  model={model}
+                  units={settings.units}
+                  theme={resolvedTheme}
+                  locationName={target?.name ?? ""}
+                  sublabel={target?.sublabel ?? ""}
+                  compact
+                />
+              </div>
+            ) : (
+              <Centered>
+                <Spinner color={c.text} />
+                <p className="mt-3 text-[15px]" style={{ color: c.sub }}>
+                  Loading weather…
+                </p>
+              </Centered>
+            )}
+          </div>
+        </div>
       </div>
 
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
@@ -189,36 +293,9 @@ export default function WeatherApp() {
   );
 }
 
-function Pill({
-  active,
-  onClick,
-  theme,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  theme: "light" | "dark";
-  children: React.ReactNode;
-}) {
-  const c = chrome(theme);
-  return (
-    <button
-      onClick={onClick}
-      className="shrink-0 px-4 py-[7px] rounded-full text-[14px] font-medium whitespace-nowrap transition-colors"
-      style={{
-        background: active ? c.cardStrong : c.card,
-        color: c.text,
-        border: `1px solid ${active ? c.accent : c.border}`,
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 function Centered({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-[420px] flex flex-col items-center justify-center text-center py-24">
+    <div className="flex flex-col items-center justify-center text-center py-24">
       {children}
     </div>
   );
@@ -228,10 +305,7 @@ function Spinner({ color }: { color: string }) {
   return (
     <div
       className="w-8 h-8 rounded-full animate-spin"
-      style={{
-        border: `3px solid ${color}`,
-        borderTopColor: "transparent",
-      }}
+      style={{ border: `3px solid ${color}`, borderTopColor: "transparent" }}
     />
   );
 }

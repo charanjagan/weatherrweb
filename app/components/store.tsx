@@ -44,15 +44,6 @@ export type GeoStatus =
   | "denied"
   | "unavailable";
 
-const BERLIN: SavedLocation = {
-  id: "geo-2950159",
-  name: "Berlin",
-  latitude: 52.52,
-  longitude: 13.41,
-  country: "Germany",
-  admin1: "Berlin",
-};
-
 const DEFAULT_SETTINGS: Settings = { theme: "system", units: METRIC_UNITS };
 
 const KEY = {
@@ -106,8 +97,8 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
-  const [savedLocations, setSavedLocations] = useState<SavedLocation[]>([BERLIN]);
-  const [activeId, setActiveId] = useState<string>(BERLIN.id);
+  const [savedLocations, setSavedLocations] = useState<SavedLocation[]>([]);
+  const [activeId, setActiveId] = useState<string>("current");
   const [currentGeo, setCurrentGeo] = useState<{
     latitude: number;
     longitude: number;
@@ -121,7 +112,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setSettings(load<Settings>(KEY.settings, DEFAULT_SETTINGS));
-    setSavedLocations(loadArray<SavedLocation>(KEY.locations, [BERLIN]));
+    setSavedLocations(loadArray<SavedLocation>(KEY.locations, []));
     const savedActive = window.localStorage.getItem(KEY.active);
     if (savedActive) setActiveId(savedActive);
     const geo = load<{ latitude: number; longitude: number } | null>(
@@ -218,6 +209,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
     );
   }, []);
+
+  // On first load, default the active location to the user's current position.
+  // If permission is denied the app falls back to the world-map view (no
+  // active location), which the UI renders without a weather panel.
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  useEffect(() => {
+    if (!ready) return;
+    if (activeId === "current" && !currentGeo && geoStatus === "idle") {
+      requestCurrentLocation();
+    }
+    // Only auto-trigger once, right after hydration.
+  }, [ready]);
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   const activeLocation: ActiveLocation | null = useMemo(() => {
     if (activeId === "current") {

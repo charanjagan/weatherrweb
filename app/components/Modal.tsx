@@ -30,7 +30,7 @@ export default function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      className="fixed inset-0 z-[2000] flex items-end sm:items-center justify-center"
       style={{ background: c.overlay }}
       onClick={onClose}
     >
