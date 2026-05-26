@@ -16,12 +16,14 @@ export default function WeatherView({
   theme,
   locationName,
   sublabel,
+  compact = false,
 }: {
   model: WeatherModel;
   units: Units;
   theme: Theme;
   locationName: string;
   sublabel: string;
+  compact?: boolean;
 }) {
   const c = chrome(theme);
   const { current } = model;
@@ -40,16 +42,26 @@ export default function WeatherView({
 
   return (
     <div
-      className="mx-auto w-full max-w-[420px] lg:max-w-[1400px] xl:max-w-[1600px]"
+      className={`mx-auto w-full ${
+        compact ? "max-w-full" : "max-w-[420px] lg:max-w-[1400px] xl:max-w-[1600px]"
+      }`}
       style={{ color: c.text }}
     >
       {/* Hero */}
-      <div className="pt-6 pb-4 lg:pt-10 lg:pb-6 px-5 text-center">
-        <h1 className="text-3xl font-medium tracking-tight">{locationName}</h1>
+      <div
+        className={`px-5 text-center ${
+          compact ? "pt-3 pb-4" : "pt-6 pb-4 lg:pt-10 lg:pb-6"
+        }`}
+      >
+        <h1 className="text-2xl font-medium tracking-tight">{locationName}</h1>
         <p className="text-sm tracking-wide" style={{ color: c.sub }}>
           {sublabel}
         </p>
-        <div className="text-[92px] font-thin leading-none mt-1 mb-1">
+        <div
+          className={`font-thin leading-none mt-1 mb-1 ${
+            compact ? "text-[80px]" : "text-[92px]"
+          }`}
+        >
           {fmtTemp(current.temp, units.temp)}
         </div>
         <p className="text-xl font-normal">{wmoToCondition(current.code)}</p>
@@ -94,10 +106,12 @@ export default function WeatherView({
       </Card>
 
       {/* Daily + details (side-by-side on desktop) */}
-      <div className="lg:flex lg:gap-3 lg:items-start">
+      <div className={compact ? "" : "lg:flex lg:gap-3 lg:items-start"}>
       <Card
         theme={theme}
-        className="mb-3 lg:mb-0 overflow-hidden lg:w-[400px] lg:shrink-0"
+        className={`mb-3 overflow-hidden ${
+          compact ? "" : "lg:mb-0 lg:w-[400px] lg:shrink-0"
+        }`}
       >
         <CardLabel theme={theme}>{model.daily.length}-Day Forecast</CardLabel>
         <div>
@@ -153,7 +167,11 @@ export default function WeatherView({
       </Card>
 
       {/* Detail grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pb-2 lg:flex-1">
+      <div
+        className={`grid grid-cols-2 gap-3 pb-2 ${
+          compact ? "" : "lg:grid-cols-4 lg:flex-1"
+        }`}
+      >
         <StatCard theme={theme} label="Feels Like">
           <BigValue>{fmtTemp(current.feels, units.temp)}</BigValue>
           <Sub theme={theme}>{feelsDesc}</Sub>

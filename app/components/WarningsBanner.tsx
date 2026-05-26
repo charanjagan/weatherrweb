@@ -7,9 +7,11 @@ import { severityColor, chrome, type Theme } from "@/lib/weather-utils";
 export default function WarningsBanner({
   warnings,
   theme,
+  compact = false,
 }: {
   warnings: WeatherWarning[];
   theme: Theme;
+  compact?: boolean;
 }) {
   const [dismissed, setDismissed] = useState<string[]>([]);
   const visible = warnings.filter((w) => !dismissed.includes(w.id));
@@ -17,7 +19,13 @@ export default function WarningsBanner({
   const c = chrome(theme);
 
   return (
-    <div className="mx-auto max-w-[420px] lg:max-w-[1400px] xl:max-w-[1600px] px-4 lg:px-6 mt-3 flex flex-col gap-2 lg:grid lg:grid-cols-2">
+    <div
+      className={
+        compact
+          ? "px-1 mt-3 flex flex-col gap-2"
+          : "mx-auto max-w-[420px] lg:max-w-[1400px] xl:max-w-[1600px] px-4 lg:px-6 mt-3 flex flex-col gap-2 lg:grid lg:grid-cols-2"
+      }
+    >
       {visible.map((w) => {
         const color = severityColor(w.severity);
         return (

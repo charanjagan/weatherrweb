@@ -8,10 +8,12 @@ export default function Header({
   theme,
   onOpenLocations,
   onOpenSettings,
+  onLocate,
 }: {
   theme: Theme;
   onOpenLocations: () => void;
   onOpenSettings: () => void;
+  onLocate: () => void;
 }) {
   const c = chrome(theme);
   const btn =
@@ -20,62 +22,82 @@ export default function Header({
 
   return (
     <header
-      className="sticky top-0 z-20"
+      className="fixed top-0 inset-x-0 z-[1300] h-14 flex items-center justify-between px-4 lg:px-6"
       style={{
-        background: theme === "dark" ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.28)",
+        background:
+          theme === "dark" ? "rgba(10,10,10,0.6)" : "rgba(255,255,255,0.6)",
         backdropFilter: "blur(20px)",
         borderBottom: `1px solid ${c.border}`,
       }}
     >
-      <div className="mx-auto max-w-[420px] lg:max-w-[1400px] xl:max-w-[1600px] flex items-center justify-between px-4 lg:px-6 h-14">
-        <div className="flex items-center gap-2">
-          <span className="text-xl leading-none">⛅</span>
-          <span className="text-[17px] font-semibold tracking-tight" style={{ color: c.text }}>
-            Weatherr<span style={{ color: c.accent }}>Web</span>
-          </span>
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="text-xl leading-none">⛅</span>
+        <span
+          className="text-[17px] font-semibold tracking-tight"
+          style={{ color: c.text }}
+        >
+          Weatherr<span style={{ color: c.accent }}>Web</span>
+        </span>
+      </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            className={btn}
-            style={btnStyle}
-            onClick={onOpenLocations}
-            aria-label="Manage locations"
-            title="Locations"
-          >
-            <LocationIcon />
-          </button>
-          <button
-            className={btn}
-            style={btnStyle}
-            onClick={onOpenSettings}
-            aria-label="Settings"
-            title="Settings"
-          >
-            <GearIcon />
-          </button>
-          <a
-            className={btn}
-            style={btnStyle}
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="GitHub"
-            title="GitHub"
-          >
-            <GitHubIcon />
-          </a>
-        </div>
+      <div className="flex items-center gap-2">
+        <button
+          className={btn}
+          style={btnStyle}
+          onClick={onLocate}
+          aria-label="Use current location"
+          title="My location"
+        >
+          <LocateIcon />
+        </button>
+        <button
+          className={btn}
+          style={btnStyle}
+          onClick={onOpenLocations}
+          aria-label="Search locations"
+          title="Search"
+        >
+          <SearchIcon />
+        </button>
+        <button
+          className={btn}
+          style={btnStyle}
+          onClick={onOpenSettings}
+          aria-label="Settings"
+          title="Settings"
+        >
+          <GearIcon />
+        </button>
+        <a
+          className={btn}
+          style={btnStyle}
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub"
+          title="GitHub"
+        >
+          <GitHubIcon />
+        </a>
       </div>
     </header>
   );
 }
 
-function LocationIcon() {
+function LocateIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11Z" />
-      <circle cx="12" cy="10" r="2.5" />
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
     </svg>
   );
 }
