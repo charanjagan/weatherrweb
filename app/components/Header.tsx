@@ -4,21 +4,10 @@ import { chrome, type Theme } from "@/lib/weather-utils";
 
 const GITHUB_URL = "https://github.com/charanjagan";
 
-export default function Header({
-  theme,
-  onOpenLocations,
-  onOpenSettings,
-  onLocate,
-}: {
-  theme: Theme;
-  onOpenLocations: () => void;
-  onOpenSettings: () => void;
-  onLocate: () => void;
-}) {
+export default function Header({ theme }: { theme: Theme }) {
   const c = chrome(theme);
   const btn =
     "flex items-center justify-center w-9 h-9 rounded-full transition-colors";
-  const btnStyle = { background: c.card, color: c.text };
 
   return (
     <header
@@ -40,74 +29,18 @@ export default function Header({
         </span>
       </div>
 
-      <div className="flex items-center gap-2">
-        <button
-          className={btn}
-          style={btnStyle}
-          onClick={onLocate}
-          aria-label="Use current location"
-          title="My location"
-        >
-          <LocateIcon />
-        </button>
-        <button
-          className={btn}
-          style={btnStyle}
-          onClick={onOpenLocations}
-          aria-label="Search locations"
-          title="Search"
-        >
-          <SearchIcon />
-        </button>
-        <button
-          className={btn}
-          style={btnStyle}
-          onClick={onOpenSettings}
-          aria-label="Settings"
-          title="Settings"
-        >
-          <GearIcon />
-        </button>
-        <a
-          className={btn}
-          style={btnStyle}
-          href={GITHUB_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub"
-          title="GitHub"
-        >
-          <GitHubIcon />
-        </a>
-      </div>
+      <a
+        className={btn}
+        style={{ background: c.card, color: c.text }}
+        href={GITHUB_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub"
+        title="GitHub"
+      >
+        <GitHubIcon />
+      </a>
     </header>
-  );
-}
-
-function LocateIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="7" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
-  );
-}
-
-function GearIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
-    </svg>
   );
 }
 

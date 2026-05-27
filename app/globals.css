@@ -1,35 +1,9 @@
 @import "tailwindcss";
 
-/* Drive the `dark:` variant off the [data-theme] attribute the store sets, so
-   a manual theme choice works regardless of the OS color-scheme setting. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-[data-theme="light"] {
-  --background: #eef2f6;
-  --foreground: #171717;
-}
-
-[data-theme="dark"] {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-dm-sans), -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -39,9 +13,11 @@ body {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), -apple-system, "Helvetica Neue", Arial, sans-serif;
+  background: #0d0d0d;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @utility scrollbar-none {
@@ -51,14 +27,41 @@ body {
   }
 }
 
-/* Leaflet must fill its sized container. */
-.leaflet-container {
-  height: 100%;
-  width: 100%;
-  background: var(--background);
-  font: inherit;
+@utility glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
 }
 
-.leaflet-default-icon-path {
-  background-image: url("https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png");
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
 }
