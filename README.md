@@ -45,10 +45,10 @@
 ---
 
 ## 🚧 Project Status: Active
-
+```
 > Core app is **done and live**. But I'm not finished yet.
 > Updates are in the pipeline. Stay tuned.
-
+```
 ---
 
 ## 🔧 What It Does
